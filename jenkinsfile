@@ -1,0 +1,74 @@
+pipeline {
+    agent {
+        node {
+            label "qa"
+        }
+    }
+    
+    tools {
+        git "my-git"
+    }
+    
+    stages {
+        stage('clone project') {
+            steps {
+                dir('/home/kesari/project') {
+                    sh "rm -rf ERPliverepo8 ERPliverepo8@tmp"
+                    sh "git clone git@192.168.1.214:/home/git/KesariDevelopment/ERPliverepo8"
+                }
+            }
+        }
+        
+        stage('copy env') {
+            steps {
+                dir('/home/kesari/project/') {
+                    sh "cp .env /home/kesari/project/ERPliverepo8"
+                }
+            }
+        }
+        
+        stage('remove old dockerfile') {
+            steps {
+                dir('/home/kesari/project/ERPliverepo8') {
+                    sh "rm -rf Dockerfile docker-compose.yml"
+                }
+            }
+        }
+        
+        stage('copy dockerfile') {
+            steps {
+                dir('/home/kesari/project/') {
+                    sh "cp Dockerfile /home/kesari/project/ERPliverepo8"
+                }
+            }
+        }
+        
+        stage('copy docker-compose') {
+            steps {
+                dir('/home/kesari/project/') {
+                    sh "cp docker-compose.yml /home/kesari/project/ERPliverepo8"
+                }
+            }
+        }
+        
+        stage('build dockerfile') {
+            steps {
+                dir('/home/kesari/project/ERPliverepo8') {
+                    sh "docker build -t mypipeline1 ."
+                }
+            }
+        }
+        
+        stage('docker-compose up') {
+            steps {
+                dir('/home/kesari/project/ERPliverepo8') {
+                    sh "docker-compose up -d"
+                }
+            }
+        }
+    }
+}
+
+
+
+
